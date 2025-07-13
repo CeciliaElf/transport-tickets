@@ -1,3 +1,4 @@
+import path from "path";
 import { defineConfig } from "@tarojs/cli";
 
 import devConfig from "./dev";
@@ -32,12 +33,12 @@ export default defineConfig(async (merge, { command, mode }) => {
       options: {},
     },
     framework: "react",
-    sass: {
-      // 对于较新版本的 Taro
-      additionalData: `$primaryColor: #2C5F74;`,
-
-      // 或者使用 data（如果版本仍支持）
-      // data: `$primaryColor: #2C5F74;`
+    // sass: {
+    //   data: `$primaryColor: #2C5F74;`,
+    // },
+    alias: {
+      "@/components": path.resolve(__dirname, "..", "src/components"),
+      "@/common": path.resolve(__dirname, "..", "src/common"),
     },
     compiler: "webpack5",
     cache: {
@@ -63,6 +64,7 @@ export default defineConfig(async (merge, { command, mode }) => {
 
         chain.plugin("definePlugin").tap((args) => {
           const define = args[0];
+          // 这些全局变量已经在 defineConstants 中定义，这里重复定义无害但冗余
           define["ENABLE_INNER_HTML"] = JSON.stringify(true);
           define["ENABLE_ADJACENT_HTML"] = JSON.stringify(true);
           define["ENABLE_CLONE_NODE"] = JSON.stringify(true);
@@ -105,9 +107,9 @@ export default defineConfig(async (merge, { command, mode }) => {
           config: {},
         },
         cssModules: {
-          enable: false, // 默认为 false，如需使用 css modules 功能，则设为 true
+          enable: false,
           config: {
-            namingPattern: "module", // 转换模式，取值为 global/module
+            namingPattern: "module",
             generateScopedName: "[name]__[local]___[hash:base64:5]",
           },
         },
@@ -117,7 +119,7 @@ export default defineConfig(async (merge, { command, mode }) => {
       appName: "taroDemo",
       postcss: {
         cssModules: {
-          enable: false, // 默认为 false，如需使用 css modules 功能，则设为 true
+          enable: false,
         },
       },
     },
@@ -125,10 +127,17 @@ export default defineConfig(async (merge, { command, mode }) => {
 
   process.env.BROWSERSLIST_ENV = process.env.NODE_ENV;
 
+  let finalConfig = {};
   if (process.env.NODE_ENV === "development") {
     // 本地开发构建配置（不混淆压缩）
-    return merge({}, baseConfig, devConfig);
+    finalConfig = merge({}, baseConfig, devConfig);
+  } else {
+    // 生产构建配置（默认开启压缩混淆等）
+    finalConfig = merge({}, baseConfig, prodConfig);
   }
-  // 生产构建配置（默认开启压缩混淆等）
-  return merge({}, baseConfig, prodConfig);
+
+  finalConfig.sass = finalConfig.sass || {};
+  // finalConfig.sass.data = `$primaryColor: #2C5F74;`;
+
+  return finalConfig;
 });

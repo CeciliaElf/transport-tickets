@@ -76,7 +76,7 @@
     line-height: 110px;
     font-weight: bolder;
   }
-  
+
   .icon-zhihuan {
     &.active {
       animation: rotate 0.5s ease;
@@ -90,9 +90,9 @@
       transform: rotate(360deg);
     }
   }
-  
+
   .search-btn {
-    background: -webkit-linear-gradient(top, #6AADD0, #2C5F74);
+    background: -webkit-linear-gradient(top, #6aadd0, #2c5f74);
     height: 88px;
     line-height: 88px;
     color: #fff;
@@ -101,10 +101,10 @@
     border-radius: 88px;
     margin-top: 10px;
   }
-  
+
   .flight-index-tab {
     .tab-content {
-      height: 350px!important;
+      height: 350px !important;
     }
   }
   .advs-banner-bd {
@@ -121,7 +121,7 @@
       border-radius: 20px;
     }
   }
-  
+
   .flight-info {
     display: block;
     margin: 42px auto 0;
@@ -134,7 +134,7 @@
   .no-data {
     margin: 0;
   }
-  
+
   // 支付宝样式兼容
   .alipay-swiper {
     margin: 30px 20px;
