@@ -3,6 +3,7 @@ export default {
     "pages/index/index",
     "pages/order/order",
     "pages/airportList/airportList",
+    "pages/calendar/calendar",
   ],
   window: {
     backgroundTextStyle: "light",

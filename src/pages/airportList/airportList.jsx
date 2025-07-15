@@ -12,6 +12,7 @@ export default class Main extends PureComponent {
     this.state = {
       cityListObj: {}, // 处理之后的城市列表
       letterList: [], // 字母列表
+      currentLetter: "", // 当前选中的字母
     };
   }
 
@@ -55,22 +56,37 @@ export default class Main extends PureComponent {
     return obj;
   };
 
+  onLetterClick = (letter) => {
+    this.setState({
+      currentLetter: letter,
+    });
+  };
+
   render() {
-    const { cityListObj, letterList } = this.state;
+    const { cityListObj, letterList, currentLetter } = this.state;
     return (
       <View className="airport-list-container">
-        <ScrollView scrollY scrollWithAnimation style={{ height: "100vh" }}>
+        <ScrollView
+          scrollY
+          scrollWithAnimation
+          style={{ height: "100vh" }}
+          scrollIntoView={currentLetter}
+        >
           {letterList?.map((item) => {
             const cityList = cityListObj[item];
             return <CityItem key={item} label={item} cityList={cityList} />;
           })}
         </ScrollView>
         <View className="letter-container">
-          {letterList?.map((item) => {
-            <View key={item} className="letter-item">
+          {letterList?.map((item) => (
+            <View
+              key={item}
+              className="letter-item"
+              onClick={() => this.onLetterClick(item)}
+            >
               {item}
-            </View>;
-          })}
+            </View>
+          ))}
         </View>
       </View>
     );

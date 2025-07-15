@@ -2,6 +2,7 @@
  * 放一些常用的工具函数
  */
 import Taro from "@tarojs/taro";
+import { objectToString } from "./utils";
 
 const tools = {
   /**
@@ -61,13 +62,13 @@ const tools = {
   },
 
   hideLoading: () => {
-    Taro.hideLoading()
+    Taro.hideLoading();
   },
 
   /**
    * 页面对话框
-   * @param {*} param 
-   * @returns 
+   * @param {*} param
+   * @returns
    */
   showToast: (param) => {
     let dptOpts = {
@@ -87,6 +88,13 @@ const tools = {
       throw new Error("参数类型有误，应该是字符串或者对象");
     }
     return Taro.showToast(dptOpts);
+  },
+  // url: 跳转的路径，data: 传递的页面参数
+  navigateTo: ({ url, data }) => {
+    const serachStr = objectToString(data);
+    return Taro.navigateTo({
+      url: `${url}?${serachStr}`,
+    });
   },
 };
 

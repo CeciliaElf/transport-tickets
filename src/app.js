@@ -1,17 +1,28 @@
+import { Component } from "react";
+import { Provider } from "react-redux";
+import createApp from "./dva";
+import models from "./models";
+import "./app.scss";
 
-import { useLaunch } from '@tarojs/taro'
+const dvaApp = createApp({
+  initialState: {},
+  models,
+});
 
-import './app.scss'
+const store = dvaApp.getStore();
 
-function App({ children }) {
-  useLaunch(() => {
-    console.log('App launched.')
-  })
+class App extends Component {
+  componentDidMount() {}
 
-  // children 是将要会渲染的页面
-  return children
+  componentDidShow() {}
+
+  componentDidHide() {}
+
+  componentDidCatchError() {}
+
+  render() {
+    return <Provider store={store}>{this.props.children}</Provider>;
+  }
 }
-  
 
-
-export default App
+export default App;

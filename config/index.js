@@ -40,7 +40,17 @@ export default defineConfig(async (merge, { command, mode }) => {
       "@/components": path.resolve(__dirname, "..", "src/components"),
       "@/common": path.resolve(__dirname, "..", "src/common"),
     },
-    compiler: "webpack5",
+    compiler: {
+      type: "webpack5",
+      prebundle: {
+        enable: true,
+        esbuild: {
+          loader: {
+            ".js": "jsx",
+          },
+        },
+      },
+    },
     cache: {
       enable: false, // Webpack 持久化缓存配置，建议开启。默认配置请参考：https://docs.taro.zone/docs/config-detail#cache
     },
@@ -55,6 +65,14 @@ export default defineConfig(async (merge, { command, mode }) => {
                 use: {
                   babelLoader: {
                     loader: require.resolve("babel-loader"),
+                    options: {
+                      presets: [
+                        [
+                          "@babel/preset-react", 
+                          { runtime: "automatic" }
+                        ]
+                      ],
+                    },
                   },
                 },
               },
@@ -62,9 +80,23 @@ export default defineConfig(async (merge, { command, mode }) => {
           },
         });
 
+        // 确保esbuild正确处理JSX语法
+        chain.module
+          .rule('script')
+          .test(/\.[jt]sx?$/)
+          .use('babel')
+          .loader('babel-loader')
+          .options({
+            presets: [
+              [
+                '@babel/preset-react',
+                { runtime: 'automatic' }
+              ]
+            ]
+          });
+
         chain.plugin("definePlugin").tap((args) => {
           const define = args[0];
-          // 这些全局变量已经在 defineConstants 中定义，这里重复定义无害但冗余
           define["ENABLE_INNER_HTML"] = JSON.stringify(true);
           define["ENABLE_ADJACENT_HTML"] = JSON.stringify(true);
           define["ENABLE_CLONE_NODE"] = JSON.stringify(true);
@@ -90,6 +122,7 @@ export default defineConfig(async (merge, { command, mode }) => {
       },
     },
     h5: {
+      esnextModules: ["taro-ui"],
       publicPath: "/",
       staticDirectory: "static",
       output: {
