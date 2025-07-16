@@ -3,6 +3,7 @@ import { View, SwiperItem, Swiper, Image, Text } from "@tarojs/components";
 import "../index/index.scss";
 import Tab from "../../../components/Tab/index";
 import NoExpolit from "../../../components/NoExploit/index";
+import tools from "../../../common/tools";
 import Taro from "@tarojs/taro";
 import { adsReq } from "../../../common/api";
 import { connect } from "react-redux";
@@ -26,7 +27,6 @@ const FLIGHT_TABS = [
 @connect(({ flightIndex }) => ({
   flightIndex,
 }))
-
 export default class FlightIndex extends PureComponent {
   constructor(props) {
     super(props);
@@ -39,6 +39,7 @@ export default class FlightIndex extends PureComponent {
   componentDidMount() {
     // 这里调用网络请求
     this.getAds();
+    this.getLocationInfo();
   }
 
   handleTabClick = (id) => {
@@ -59,26 +60,62 @@ export default class FlightIndex extends PureComponent {
   };
 
   chooseFlightCtiy = (type) => {
-    this.props.dispatch ({
+    this.props.dispatch({
       type: "flightIndex/updateState",
       payload: {
         cityType: type,
-      }
-    })
+      },
+    });
     Taro.navigateTo({
       url: "/pages/airportList/airportList",
+    });
+  };
+
+  /**
+   * 获取经纬度
+   */
+  getLocationInfo = () => {
+    Taro.getLocation({
+      type: "gcj02",
     })
-  }
+      .then((res) => {
+        const { latitude, longitude } = res;
+        this.getCity({ latitude, longitude });
+      })
+      .catch(() => {
+        tools.showToast("位置获取失败~~");
+      });
+  };
+
+  getCity = ({ latitude, longitude }) => {
+    Taro.request({
+      url: `https://apis.map.qq.com/ws/geocoder/v1/?key=ZIKBZ-D5ZLJ-BNJFX-XZORW-MLLUZ-CZBWV&location=${latitude},${longitude}`,
+    }).then((res) => {
+      const { data } = res;
+      const cityInfo = data?.result?.ad_info || {};
+      this.props.dispatch({
+        type: "flightIndex/updateState",
+        payload: {
+          dptCityId: cityInfo.city_code || 2,
+          dptCityName: cityInfo.city || "上海",
+        },
+      });
+    });
+  };
 
   chooseFlightDate = () => {
     Taro.navigateTo({
-      url: "/pages/calendar/calendar"
-    })
-  }
+      url: "/pages/calendar/calendar",
+    });
+  };
 
   render() {
     const { adList } = this.state;
-    const { arrCityName = "北京", dptCityName = "上海", dptDate } = this.props.flightIndex;
+    const {
+      arrCityName = "北京",
+      dptCityName = "上海",
+      dptDate,
+    } = this.props.flightIndex;
     return (
       <View className="flight-container">
         <View className="flight-top">
